@@ -1,1 +1,101 @@
+import React, { useState } from "react";
+
+function App() {
+  const [args, setArgs] = useState([{ value: false }]);
+  const [ops, setOps] = useState([{ value: "constant" }]);
+  const [results, setResults] = useState([]);
+
+  const handleArgChange = (index, value) => {
+    const newArgs = [...args];
+    newArgs[index].value = value;
+    setArgs(newArgs);
+  };
+
+  const handleOpChange = (index, value) => {
+    const newOps = [...ops];
+    newOps[index].value = value;
+    setOps(newOps);
+  };
+
+  const handleAddArg = () => {
+    setArgs([...args, { value: false }]);
+    setOps([...ops, { value: "constant" }]);
+  };
+
+  const handleAddOp = () => {
+    setOps([...ops, { value: "constant" }]);
+  };
+
+  const handleRemoveArg = (index) => {
+    const newArgs = [...args];
+    const newOps = [...ops];
+    newArgs.splice(index, 1);
+    newOps.splice(index, 1);
+    setArgs(newArgs);
+    setOps(newOps);
+  };
+
+  const evaluateArgs = () => {
+    let result = args[0].value;
+    for (let i = 1; i < args.length; i++) {
+      if (ops[i - 1].value === "or") {
+        result = result || args[i].value;
+      } else {
+        result = result && args[i].value;
+      }
+    }
+    setResults([...results, result]);
+  };
+
+  return (
+    <div>
+      {args.map((arg, index) => (
+        <div key={index}>
+          <select
+            value={arg.value}
+            onChange={(e) => handleArgChange(index, e.target.value === "true")}
+          >
+            <option value={false}>false</option>
+            <option value={true}>true</option>
+          </select>
+          {index !== 0 && (
+            <select
+              value={ops[index - 1].value}
+              onChange={(e) =>
+                handleOpChange(index - 1, e.target.value)
+              }
+            >
+              <option value="constant">constant</option>
+              <option value="or">or</option>
+              <option value="and">and</option>
+            </select>
+          )}
+          {index !== 0 && (
+            <button onClick={() => handleRemoveArg(index)}>X</button>
+          )}
+        </div>
+      ))}
+      <button onClick={handleAddArg}>+ Add Arg</button>
+      {ops.map((op, index) => (
+        <div key={index}>
+          <select
+            value={op.value}
+            onChange={(e) => handleOpChange(index, e.target.value)}
+          >
+            <option value="constant">constant</option>
+            <option value="or">or</option>
+            <option value="and">and</option>
+          </select>
+          <button onClick={handleAddOp}>+ Add Op</button>
+        </div>
+      ))}
+      <button onClick={evaluateArgs}>Evaluate Args</button>
+      {results.map((result, index) => (
+        <div key={index}>Result: {result.toString()}</div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
 
